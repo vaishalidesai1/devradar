@@ -4,17 +4,17 @@ abstract class Failure {
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure(this.message) : super(message);
+  const ServerFailure(String message) : super(message);
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure(this.message) : super(message);
+  const NetworkFailure(String message) : super(message);
 }
 
 class ParsingFailure extends Failure {
-  const ParsingFailure(this.message) : super(message);
+  const ParsingFailure(String message) : super(message);
 }
 
 class TimeoutFailure extends Failure {
-  const TimeoutFailure(this.message) : super(message);
+  const TimeoutFailure(String message) : super(message);
 }

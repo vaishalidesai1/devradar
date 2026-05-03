@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-// import 'package:firebase_core/firebase_core.dart'; // Uncomment after generating firebase options
+// import 'package:firebase_core/firebase_core.dart'; // Uncomment after adding google-services.json
+
+import 'presentation/providers/trending_provider.dart';
+import 'presentation/providers/prediction_provider.dart';
+import 'presentation/providers/favorites_provider.dart';
+import 'presentation/providers/dashboard_provider.dart';
+import 'presentation/screens/home/home_screen.dart';
+import 'presentation/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize dotenv
-  await dotenv.load(fileName: ".env");
-  
-  // Initialize Firebase (Assuming options are configured for the platform)
-  // await Firebase.initializeApp();
-
-  runApp(const TechPulseApp());
+  await dotenv.load(fileName: '.env');
+  // await Firebase.initializeApp(); // Uncomment after Firebase setup
+  runApp(const DevRadarApp());
 }
 
-class TechPulseApp extends StatelessWidget {
-  const TechPulseApp({super.key});
+class DevRadarApp extends StatelessWidget {
+  const DevRadarApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // TODO: Inject repositories and providers here
+        ChangeNotifierProvider(create: (_) => TrendingProvider()),
+        ChangeNotifierProvider(create: (_) => PredictionProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
       ],
       child: MaterialApp(
-        title: 'TechPulse',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const Scaffold(
-          body: Center(
-            child: Text('TechPulse Data Layer Initialized'),
-          ),
-        ),
+        title: 'DevRadar',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        home: const HomeScreen(),
       ),
     );
   }

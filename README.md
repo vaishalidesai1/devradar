@@ -1,99 +1,125 @@
-# TechPulse
+# 🚀 DevRadar
 
-TechPulse is a complete Flutter project structure focused exclusively on the **Data Layer** and **Core Setup** following **Clean Architecture** principles.
+> Explorador de tendencias tech con predicción IA — Flutter App  
+> **CMP 3104 · Programación Avanzada de Apps · USFQ 2025**
 
-## 1. What the project is
+---
 
-TechPulse is designed to discover trending technologies by parsing data from GitHub, Dev.to, and OpenAI, while utilizing Firebase for data persistence. This codebase establishes the foundational models, remote datasources, repositories, and dependency structures required for an enterprise-level mobile application. It contains no presentation logic or UI elements (except for a minimal `main.dart` entry point).
+## ✨ ¿Qué hace?
 
-## 2. Project Architecture (Clean Architecture)
+DevRadar consume datos reales de GitHub y Dev.to para mostrar qué tecnologías están en tendencia, y usa OpenAI para predecir cuál va a explotar la próxima semana. Todo con un diseño cálido y amigable, sin la estética robótica de siempre.
 
-This project strictly adheres to Clean Architecture for the Data and Core layers:
+| Pantalla | Qué hace |
+|---|---|
+| 🔥 **Trending** | Repos más populares de GitHub + artículos de Dev.to en tiempo real |
+| 📊 **Dashboard** | Gráficos interactivos de evolución por lenguaje con fl_chart |
+| 🤖 **IA Predictor** | OpenAI analiza tendencias y predice qué tech va a crecer esta semana |
+| 🔖 **Guardados** | Repos favoritos guardados localmente (Firebase opcional) |
 
-- **Core Layer (`lib/core/`)**: Contains app-wide constants (like API URLs) and common logic such as custom exceptions and failures. This layer is independent of any external packages or frameworks.
-- **Data Layer (`lib/data/`)**: Responsible for data retrieval and manipulation. It's subdivided into:
-  - **Models**: Plain Dart objects that map to external JSON/Firestore structures. Includes `fromJson` and `toMap` methods.
-  - **Datasources**: Direct handlers for external APIs or databases. They use `http` for REST calls, `cloud_firestore` for Firebase, and handle all mapping/parsing raw data.
-  - **Repositories**: Implementing business logic boundaries. They coordinate one or more datasources, map raw exceptions into unified `Failure` classes, and ensure separation of concerns.
+---
 
-## 3. Folder Structure Explained
+## 🛠️ Stack
 
-```text
+- **Flutter + Dart** — UI multiplataforma
+- **Provider** — manejo de estado
+- **GitHub API + Dev.to API** — datos reales de trending
+- **OpenAI API (gpt-4o-mini)** — predicción semanal con razonamiento
+- **Firebase Firestore** — persistencia (configuración opcional)
+- **fl_chart** — gráficos interactivos
+- **Clean Architecture** — capas data / domain / presentation
+
+---
+
+## 📁 Estructura
+
+```
 lib/
-├── core/
-│    ├── constants/
-│    │     └── api_constants.dart       # Holds all endpoint URLs for GitHub, Dev.to, and OpenAI
-│    └── errors/
-│          └── failures.dart            # Custom exception wrapper classes (ServerFailure, NetworkFailure, etc.)
-│
-├── data/
-│    ├── datasources/
-│    │     ├── devto_remote_datasource.dart   # Fetches top and Flutter articles from Dev.to API
-│    │     ├── firebase_datasource.dart       # Handles CRUD operations on Firestore collections
-│    │     ├── github_remote_datasource.dart  # Fetches trending and Flutter repositories from GitHub API
-│    │     └── openai_datasource.dart         # Calls OpenAI's API to predict next trends using GPT
-│    │
-│    ├── models/
-│    │     ├── favorite_model.dart            # Model for saved repositories in Firestore
-│    │     ├── language_stat_model.dart       # Model for language tracking history in Firestore
-│    │     ├── prediction_model.dart          # Model mapping OpenAI JSON predictions
-│    │     └── trending_repo_model.dart       # Model for GitHub repository response
-│    │
-│    └── repositories/
-│          ├── ai_repository_impl.dart        # Coordinates AI data logic (OpenAI)
-│          ├── favorites_repository_impl.dart # Coordinates Firestore Favorites logic
-│          └── github_repository_impl.dart    # Coordinates both GitHub and Dev.to logic
-│
-└── main.dart                                 # App entry point with initialization steps
+├── core/           # Constantes y errores
+├── data/           # APIs, Firebase, modelos (Daniel)
+│   ├── datasources/
+│   ├── models/
+│   └── repositories/
+└── presentation/   # UI, providers, pantallas (Vai)
+    ├── providers/
+    ├── screens/
+    ├── theme/
+    └── widgets/
 ```
 
-## 4. How Each Datasource Works
+---
 
-- **`GithubRemoteDatasource`**: Uses the `http` package to call the GitHub Search API. Supports optional Bearer authentication via a `.env` token and decodes the JSON list of repositories into `TrendingRepoModel` lists.
-- **`DevToRemoteDatasource`**: Queries the unauthenticated Dev.to API for trending tech or specific "Flutter" tags, mapping the responses directly into custom Dart Maps/models.
-- **`OpenAiDatasource`**: Communicates with the OpenAI Chat Completions API. It passes a strict system prompt to ensure GPT returns only a JSON object. This response string is parsed directly into a `PredictionModel`.
-- **`FirebaseDatasource`**: Uses `cloud_firestore` to directly read/write documents. It maps to three core collections: `favorites`, `predictions`, and `language_history`.
+## 🚀 Cómo correr
 
-## 5. How to Configure `.env`
+### Local (Flutter)
 
-1. Duplicate the `.env.example` file and rename it to `.env`.
-2. Add your secret keys inside the new `.env` file:
-   ```env
-   GITHUB_TOKEN=your_github_personal_access_token_here
-   OPENAI_API_KEY=your_openai_api_key_here
-   ```
-3. Never commit `.env` to version control (ensure it is added to `.gitignore`).
+```bash
+# 1. Clonar
+git clone https://github.com/tu-usuario/devradar.git
+cd devradar
 
-## 6. How to Run the Project
+# 2. Crear .env en la raíz
+echo "GITHUB_TOKEN=tu_token_aqui" > .env
+echo "OPENAI_API_KEY=tu_key_aqui" >> .env
 
-1. Run `flutter pub get` to install all necessary dependencies (http, provider, firebase_core, flutter_dotenv, etc.).
-2. Ensure you have followed the standard Firebase setup for your target platforms (Android/iOS) using `flutterfire configure`.
-3. Uncomment the `Firebase.initializeApp()` line in `lib/main.dart` once Firebase is configured.
-4. Run `flutter run` on your target device or simulator.
+# 3. Instalar dependencias
+flutter pub get
 
-## 7. API Descriptions
+# 4. Correr
+flutter run
+```
 
-- **GitHub API**: 
-  - `GET /search/repositories?q=stars:>500&sort=stars&order=desc&per_page=20` (Trending Repos)
-  - `GET /search/repositories?q=language:flutter&sort=stars&order=desc` (Flutter Repos)
-- **Dev.to API**:
-  - `GET /api/articles?top=7` (Top general articles)
-  - `GET /api/articles?tag=flutter&per_page=10` (Top Flutter articles)
-- **OpenAI API**:
-  - `POST /v1/chat/completions` (GPT-4o-mini completion targeting JSON output)
+### Docker (web)
 
-## 8. Firebase Setup
+```bash
+# Construir y correr
+docker-compose up --build
 
-The application logic targets **Cloud Firestore**. Make sure the following collections exist or allow creation via security rules:
-- `favorites`: Stores favorite GitHub repositories per user.
-- `predictions`: Stores generated OpenAI predictions.
-- `language_history`: Stores language popularity stats over time.
+# La app estará en http://localhost:8080
+```
 
-You must set up a Firebase project and run `flutterfire configure` to generate `firebase_options.dart` for this application to connect.
+> ⚠️ Asegúrate de que el archivo `.env` esté en la raíz antes de correr Docker.
 
-## 9. Error Handling Strategy
+---
 
-- All remote calls are wrapped in `try/catch` blocks inside the datasources.
-- Timeouts are strictly enforced on HTTP calls (`.timeout()`).
-- Datasources throw generic Dart `Exception`s which are caught by the Repositories.
-- Repositories map these exceptions into strictly typed `Failure` objects (e.g., `ServerFailure`, `NetworkFailure`). These custom objects keep domain boundary logic clean and make it easier for a future Presentation layer to display clear UI warnings to the user.
+## 🔑 Variables de entorno
+
+Crea un archivo `.env` en la raíz del proyecto:
+
+```env
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxx
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
+```
+
+| Variable | Dónde obtenerla | Requerida |
+|---|---|---|
+| `GITHUB_TOKEN` | [github.com/settings/tokens](https://github.com/settings/tokens) | Recomendada (evita rate limit) |
+| `OPENAI_API_KEY` | [platform.openai.com](https://platform.openai.com/api-keys) | Sí (para predicciones IA) |
+
+> ⚠️ **Nunca subas `.env` a GitHub** — ya está en `.gitignore`
+
+---
+
+## 🔥 Firebase (opcional)
+
+Para activar persistencia de favoritos en la nube:
+
+1. Crea un proyecto en [Firebase Console](https://console.firebase.google.com)
+2. Agrega una app Android/iOS/Web
+3. Descarga `google-services.json` → ponlo en `android/app/`
+4. En `lib/main.dart`, descomenta las líneas de Firebase
+5. En `lib/presentation/providers/favorites_provider.dart`, conecta con `FavoritesRepositoryImpl`
+
+---
+
+## 👥 Equipo
+
+| Persona | Rol | Capa |
+|---|---|---|
+| **Vai** | UI / Frontend | `presentation/` (providers, pantallas, widgets, tema) |
+| **Daniel** | Backend / Data | `data/` (APIs, Firebase, modelos, repositorios) |
+
+---
+
+## 📄 Licencia
+
+MIT — Universidad San Francisco de Quito · 2025

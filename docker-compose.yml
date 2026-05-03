@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  devradar:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      - FLUTTER_WEB_USE_SKIA=true
+    volumes:
+      # Mount .env at runtime (never bake secrets into image)
+      - ./.env:/usr/share/nginx/html/.env:ro
