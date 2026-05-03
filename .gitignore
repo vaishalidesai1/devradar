@@ -1,0 +1,7 @@
+.env
+.dart_tool/
+.packages
+build/
+.pub-cache/
+.pub/
+/android/app/src/main/res/values/secrets.xml
