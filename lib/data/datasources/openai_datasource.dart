@@ -20,27 +20,29 @@ class OpenAiDatasource {
       'Authorization': 'Bearer $apiKey',
     };
 
+    final model = dotenv.env['OPENAI_MODEL'] ?? 'llama-3.1-8b-instant';
+    print('OpenAI model used: $model');
+
     final body = json.encode({
-      "model": "gpt-4o-mini",
-      "response_format": { "type": "json_object" },
+      "model": model,
+      "response_format": {"type": "json_object"},
       "messages": [
         {
           "role": "system",
-          "content": "You are a tech analyst. Return ONLY a valid JSON object with keys: techName, forecastScore (number), reasoning."
+          "content":
+              "You are a tech analyst. Return ONLY a valid JSON object with keys: techName, forecastScore (number), reasoning."
         },
-        {
-          "role": "user",
-          "content": prompt
-        }
+        {"role": "user", "content": prompt}
       ]
     });
 
     try {
-      final response = await client.post(
-        Uri.parse(ApiConstants.openaiChatCompletions),
-        headers: headers,
-        body: body,
-      ).timeout(const Duration(seconds: 15));
+      final request = http.Request('POST', Uri.parse(ApiConstants.openaiChatCompletions))
+        ..headers.addAll(headers)
+        ..body = body;
+
+      final streamedResponse = await client.send(request).timeout(const Duration(seconds: 15));
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
         final decoded = json.decode(response.body);
@@ -48,7 +50,10 @@ class OpenAiDatasource {
         final Map<String, dynamic> contentJson = json.decode(contentStr);
         return PredictionModel.fromJson(contentJson);
       } else {
-        throw Exception('OpenAI API Error: ${response.statusCode}');
+        print('Request URL: ${streamedResponse.request?.url}');
+        print('Status Code: ${response.statusCode}');
+        print('Error Body: ${response.body}');
+        throw Exception('OpenAI API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       throw Exception('Failed to get prediction: $e');

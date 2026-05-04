@@ -18,7 +18,7 @@ class GithubRemoteDatasource {
 
   Future<List<TrendingRepoModel>> getFlutterRepositories() async {
     final response = await _getWithAuth(
-      '${ApiConstants.githubSearchRepos}?q=language:flutter&sort=stars&order=desc',
+      '${ApiConstants.githubSearchRepos}?q=language:flutter+stars:>500&sort=stars&order=desc&per_page=20',
     );
     return _parseRepos(response);
   }
